@@ -9,6 +9,7 @@
 #define Sensor_User "engineer"           //<<<<<<<<<<<<<<<<<<< NOTE change these and possibly others below <<<<<<<<<<
 #define Sensor_Password "heathack"         //>>>> WARNING password may have to be at least 8 characters or WiFI.softAP(..) fails.
 #define transmitPIN 12 
+#define transmitPowerPIN 14              //save battery. Quiescent not as low as claimed be.
 #define DHTpin 13 
              
 #include <RCSwitch.h>
@@ -75,6 +76,8 @@ String save2Types[] = {"flash", "radio", "wifi"};
 String sFileName, sFileDate, sFileTime,sOTA_PW, sOTA_SSID;
 
 void setup() {
+  pinMode(transmitPowerPIN, OUTPUT);  
+  digitalWrite(transmitPowerPIN, LOW);  //keep transmitter off
   Serial.begin(9600);  
   sFileName = __FILE__;
   sFileDate = __TIME__;
@@ -591,9 +594,11 @@ void showExtraInputs() {   //process
  }
 
 void transmit(unsigned long data, int repeats, int bitLen) { //###
+  digitalWrite(transmitPowerPIN, HIGH);
   delay(5);
   mySwitch.setRepeatTransmit(repeats);
   mySwitch.send(data, bitLen); 
+  digitalWrite(transmitPowerPIN, LOW);
   //Serial.print(" transmitted data ");Serial.print(data); Serial.print("  bitlen  ");Serial.println(bitLen);
   //delay(10);    //##1 reduced from 500
 }
